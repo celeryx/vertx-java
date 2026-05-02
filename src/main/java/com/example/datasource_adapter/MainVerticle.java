@@ -3,11 +3,13 @@ package com.example.datasource_adapter;
 import com.example.datasource_adapter.commons.config.AppConfig;
 import com.example.datasource_adapter.commons.di.AppModule;
 import com.example.datasource_adapter.commons.web.OpenApiController;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import io.reactivex.rxjava3.core.Completable;
+import io.vertx.core.json.jackson.DatabindCodec;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.ext.web.openapi.router.RouterBuilder;
 import io.vertx.rxjava3.openapi.contract.OpenAPIContract;
@@ -32,6 +34,7 @@ public class MainVerticle extends AbstractVerticle {
     Injector injector = Guice.createInjector(new AppModule(vertx, config));
     Set<OpenApiController> controllers = injector.getInstance(Key.get(new TypeLiteral<Set<OpenApiController>>() {
     }));
+    DatabindCodec.mapper().registerModule(new JavaTimeModule());
 
     return OpenAPIContract.rxFrom(vertx, "openapi.yaml")
       .flatMap(contract -> {

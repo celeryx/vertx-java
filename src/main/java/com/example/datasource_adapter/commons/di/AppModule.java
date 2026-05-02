@@ -4,6 +4,7 @@ import com.example.datasource_adapter.commons.config.AppConfig;
 import com.example.datasource_adapter.commons.web.OpenApiController;
 import com.example.datasource_adapter.controllers.HealthCheckController;
 import com.example.datasource_adapter.controllers.WarrantyController;
+import com.example.datasource_adapter.converters.WarrantyMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -13,6 +14,7 @@ import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.pgclient.PgBuilder;
 import io.vertx.rxjava3.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
+import org.mapstruct.factory.Mappers;
 
 public class AppModule extends AbstractModule {
 
@@ -45,9 +47,14 @@ public class AppModule extends AbstractModule {
       .build();
   }
 
+  @Provides
+  @Singleton
+  public WarrantyMapper provideWarrantyMapper() {
+    return Mappers.getMapper(WarrantyMapper.class);
+  }
+
   @Override
   protected void configure() {
-
     bind(Vertx.class).toInstance(vertx);
     bind(AppConfig.class).toInstance(config);
 

@@ -1,9 +1,10 @@
 package com.example.datasource_adapter.models.entities.warranties;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record WarrantyEntity(
@@ -12,7 +13,8 @@ public record WarrantyEntity(
   String warrantyDescription,
   int warrantyExpiresIn,
   boolean warrantyIsExpired,
-  OffsetDateTime warrantyCreatedAt,
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  LocalDateTime warrantyCreatedAt,
   String warrantyCreatedByDni,
   String warrantyCreatedByEmail,
   String productId,

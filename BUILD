@@ -1,8 +1,8 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_plugin")
 
 java_plugin(
-    name = "mapstruct_plugin",
-    processor_class = "org.mapstruct.processor.MapStructProcessor",
+    name = "mapstruct_processor",
+    processor_class = "org.mapstruct.ap.MappingProcessor",
     deps = ["@maven//:org_mapstruct_mapstruct_processor"],
 )
 
@@ -10,7 +10,9 @@ java_library(
     name = "app_lib",
     srcs = glob(["src/main/java/**/*.java"]),
     resources = glob(["src/main/resources/**/*"]),
-    exported_plugins = [":mapstruct_plugin"],
+    plugins = [":mapstruct_processor"],
+    # Fixed the name here to match the plugin name above
+    exported_plugins = [":mapstruct_processor"],
     deps = [
         "@maven//:io_vertx_vertx_core",
         "@maven//:io_vertx_vertx_health_check",
@@ -22,6 +24,7 @@ java_library(
         "@maven//:io_vertx_vertx_web",
         "@maven//:com_google_inject_guice",
         "@maven//:jakarta_inject_jakarta_inject_api",
+        "@maven//:jakarta_annotation_jakarta_annotation_api",
         "@maven//:io_vertx_vertx_openapi",
         "@maven//:io_vertx_vertx_web_openapi_router",
         "@maven//:org_slf4j_slf4j_api",
@@ -33,6 +36,7 @@ java_library(
         "@maven//:io_vertx_vertx_pg_client",
         "@maven//:io_vertx_vertx_sql_client",
         "@maven//:io_vertx_vertx_sql_client_templates",
+        "@maven//:com_fasterxml_jackson_datatype_jackson_datatype_jsr310",
     ],
 )
 
