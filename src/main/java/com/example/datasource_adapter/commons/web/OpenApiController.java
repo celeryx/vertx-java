@@ -1,5 +1,6 @@
 package com.example.datasource_adapter.commons.web;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.ext.web.RoutingContext;
 import io.vertx.rxjava3.ext.web.openapi.router.RouterBuilder;
 import org.slf4j.Logger;
@@ -20,22 +21,33 @@ public interface OpenApiController {
       .filter(method -> method.getParameterCount() == 1)
       .filter(method -> method.getParameterTypes()[0].equals(RoutingContext.class))
       .forEach(method -> {
-      String operationId = method.getName();
+        String operationId = method.getName();
 
-      try {
-        builder.getRoute(operationId).addHandler(ctx -> {
-          try {
-            method.invoke(this, ctx);
-          } catch (Exception e) {
-            ctx.fail(500, e);
-          }
-        });
+        try {
+          builder.getRoute(operationId).addHandler(ctx -> {
+            try {
+              method.invoke(this, ctx);
+            } catch (Exception e) {
+              ctx.fail(500, e);
+            }
+          });
 
-        log.info("✅ Auto-bound OpenAPI operation: {}", operationId);
+          log.info("✅ Auto-bound OpenAPI operation: {}", operationId);
 
-      } catch (IllegalArgumentException | NullPointerException ignored) {
-        // 3. Fallback to standard Java practice for intentionally ignored exceptions without preview features
-      }
-    });
+        } catch (IllegalArgumentException | NullPointerException ignored) {
+          // 3. Fallback to standard Java practice for intentionally ignored exceptions without preview features
+        }
+      });
+  }
+
+  default void sendResponse(RoutingContext ctx, int statusCode, JsonObject payload) {
+    var unused = ctx.response()
+      .setStatusCode(statusCode)
+      .putHeader("content-type", "application/json")
+      .end(payload.encode())
+      .subscribe(
+        () -> { /* Complete */ },
+        err -> ctx.fail(500, err)
+      );
   }
 }

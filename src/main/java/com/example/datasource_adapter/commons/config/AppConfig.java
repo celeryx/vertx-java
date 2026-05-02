@@ -64,8 +64,8 @@ public record AppConfig(ServerConfig server, DatabaseConfig database) {
     return Pattern.compile("\\$\\{([^:}]+)(?::([^}]*))?}")
       .matcher(raw)
       .replaceAll(result -> {
-        String key = result.group(1);
-        String defaultValue = result.group(2);
+        var key = result.group(1);
+        var defaultValue = result.group(2);
         return Optional.ofNullable(System.getenv(key))
           .or(() -> Optional.ofNullable(System.getProperty(key)))
           .or(() -> Optional.ofNullable(defaultValue))

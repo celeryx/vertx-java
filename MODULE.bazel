@@ -33,6 +33,7 @@ maven.install(
         "io.vertx:vertx-sql-client-templates:5.0.11",
         "jakarta.annotation:jakarta.annotation-api:3.0.0",
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0",
+        "jakarta.inject:jakarta.inject-api:2.0.1",
         # Testing artifacts
         "io.vertx:vertx-junit5:5.0.11",
         "org.junit.jupiter:junit-jupiter-api:5.9.1",
