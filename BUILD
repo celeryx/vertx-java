@@ -44,5 +44,6 @@ java_binary(
     name = "app",
     main_class = "io.vertx.launcher.application.VertxApplication",
     args = ["com.example.datasource_adapter.MainVerticle"],
+    deploy_manifest_lines = ["Main-Verticle: com.example.datasource_adapter.MainVerticle"],
     runtime_deps = [":app_lib"],
 )
