@@ -6,11 +6,6 @@ import io.vertx.rxjava3.sqlclient.templates.RowMapper;
 import io.vertx.rxjava3.sqlclient.templates.SqlTemplate;
 import io.vertx.rxjava3.sqlclient.templates.TupleMapper;
 
-/**
- * Base repository to handle generic SQL operations and cache mappers.
- *
- * @param <T> The Entity type
- */
 public abstract class BaseRepository<T> {
 
   protected final Pool dbPool;
@@ -25,17 +20,18 @@ public abstract class BaseRepository<T> {
     this.rxRowMapper = RowMapper.newInstance(coreRowMapper);
   }
 
-  /**
-   * Generic Insert Operation (Fast Path - No explicit transaction)
-   */
   public Single<T> insert(T entity, String sql) {
+    return executeWithCustomReturn(entity, sql, this.rxRowMapper);
+  }
+
+  public <R> Single<R> executeWithCustomReturn(T params, String sql, RowMapper<R> customReturnMapper) {
     return SqlTemplate.forQuery(dbPool, sql)
       .mapFrom(rxTupleMapper)
-      .mapTo(rxRowMapper)
-      .rxExecute(entity)
+      .mapTo(customReturnMapper)
+      .rxExecute(params)
       .map(rowSet -> {
         if (!rowSet.iterator().hasNext()) {
-          throw new IllegalStateException("Insert failed, no rows returned.");
+          throw new IllegalStateException("Query executed but no rows returned.");
         }
         return rowSet.iterator().next();
       });
