@@ -9,6 +9,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
+import io.vertx.core.net.NetClientOptions;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.pgclient.PgBuilder;
@@ -36,12 +37,34 @@ public class AppModule extends AbstractModule {
       .setHost(db.host())
       .setDatabase(db.name())
       .setUser(db.username())
-      .setPassword(db.password());
+      .setPassword(db.password())
+      .setReconnectAttempts(3)
+      .setReconnectInterval(1000)
+      .setCachePreparedStatements(true)
+      .setPreparedStatementCacheMaxSize(250)
+      .setPipeliningLimit(16);
 
-    PoolOptions poolOptions = new PoolOptions().setMaxSize(5);
+    NetClientOptions tcpOptions = new NetClientOptions()
+      .setTcpNoDelay(true)
+      .setTcpKeepAlive(true)
+      .setTcpFastOpen(true)
+      .setTcpQuickAck(true)
+      .setTcpCork(false)
+      .setReuseAddress(true)
+      .setReusePort(true)
+      .setSendBufferSize(32 * 1024)
+      .setReceiveBufferSize(32 * 1024);
+
+    PoolOptions poolOptions = new PoolOptions()
+      .setMaxSize(20)
+      .setMaxWaitQueueSize(1000)
+      .setConnectionTimeout(5000)
+      .setIdleTimeout(10)
+      .setIdleTimeoutUnit(java.util.concurrent.TimeUnit.MINUTES);
 
     return PgBuilder.pool()
       .with(poolOptions)
+      .with(tcpOptions)
       .connectingTo(connectOptions)
       .using(vertx)
       .build();

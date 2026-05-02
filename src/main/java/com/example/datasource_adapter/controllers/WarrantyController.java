@@ -5,7 +5,6 @@ import com.example.datasource_adapter.models.dtos.warranties.WarrantyCreateRqDto
 import com.example.datasource_adapter.services.WarrantyManagerService;
 import com.google.inject.Inject;
 import io.vertx.core.json.JsonObject;
-import io.vertx.openapi.validation.ValidatedRequest;
 import io.vertx.rxjava3.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
