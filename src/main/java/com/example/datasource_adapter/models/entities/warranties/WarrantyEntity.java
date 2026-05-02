@@ -1,10 +1,11 @@
 package com.example.datasource_adapter.models.entities.warranties;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.time.LocalDateTime;
+
+import static io.vertx.core.json.JsonObject.mapFrom;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record WarrantyEntity(
@@ -13,7 +14,6 @@ public record WarrantyEntity(
   String warrantyDescription,
   int warrantyExpiresIn,
   boolean warrantyIsExpired,
-  @JsonFormat(shape = JsonFormat.Shape.STRING)
   LocalDateTime warrantyCreatedAt,
   String warrantyCreatedByDni,
   String warrantyCreatedByEmail,
@@ -21,4 +21,10 @@ public record WarrantyEntity(
   String warrantyTypeId,
   String providerId
 ) {
+
+  public java.util.Map<String, Object> toPersistenceMap() {
+    var map = mapFrom(this).getMap();
+    map.put("warranty_created_at", this.warrantyCreatedAt());
+    return map;
+  }
 }

@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record WarrantyCreateRsDto(
+  String id,
+  String createdByDni,
+  String createdByEmail,
+  String createdAt,
   String assetNumber,
   String description,
   int daysToExpire,

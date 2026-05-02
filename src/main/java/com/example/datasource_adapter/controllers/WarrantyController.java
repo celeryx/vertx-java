@@ -21,28 +21,23 @@ public class WarrantyController implements OpenApiController {
 
   public void createWarranty(RoutingContext ctx) {
     try {
-      ValidatedRequest validated = ctx.get("openApiValidatedRequest");
 
-      if (validated == null) {
-        ctx.fail(400, new RuntimeException("OpenAPI context missing"));
-        return;
-      }
+      WarrantyCreateRqDto body = extractValidatedJsonBody(ctx, WarrantyCreateRqDto.class);
 
-      if (validated.getBody() != null && validated.getBody().get() instanceof JsonObject jsonBody) {
-        WarrantyCreateRqDto body = jsonBody.mapTo(WarrantyCreateRqDto.class);
+      var disposable = service.createWarranty(body)
+        .subscribe(
+          result -> sendResponse(ctx, 201, JsonObject.mapFrom(result)),
+          ctx::fail
+        );
 
-        var disposable = service.createWarranty(body)
-          .subscribe(
-            result -> sendResponse(ctx, 201, JsonObject.mapFrom(result)), // Used the DRY method
-            ctx::fail
-          );
-        ctx.addEndHandler(v -> disposable.dispose());
-      } else {
-        ctx.fail(400, new RuntimeException("Empty or invalid request body"));
-      }
-    } catch (Exception e) {
-      log.error("Mapping Error: ", e);
+      ctx.addEndHandler(v -> disposable.dispose());
+
+    } catch (IllegalArgumentException e) {
+      log.error("Validation Error: {}", e.getMessage());
       ctx.fail(400, e);
+    } catch (Exception e) {
+      log.error("Internal Server Error during mapping: ", e);
+      ctx.fail(500, e);
     }
   }
 

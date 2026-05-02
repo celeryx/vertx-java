@@ -3,12 +3,14 @@ package com.example.datasource_adapter.commons.web;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.ext.web.RoutingContext;
 import io.vertx.rxjava3.ext.web.openapi.router.RouterBuilder;
+import io.vertx.openapi.validation.ValidatedRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 public interface OpenApiController {
+  String VALIDATED_REQUEST_KEY = "openApiValidatedRequest";
 
   /**
    * Automatically binds Java methods to OpenAPI operation IDs using Reflection.
@@ -49,5 +51,19 @@ public interface OpenApiController {
         () -> { /* Complete */ },
         err -> ctx.fail(500, err)
       );
+  }
+
+  default <T> T extractValidatedJsonBody(RoutingContext ctx, Class<T> clazz) {
+    ValidatedRequest validated = ctx.get(VALIDATED_REQUEST_KEY);
+
+    if (validated == null) {
+      throw new IllegalArgumentException("OpenAPI validation context is missing. Check openapi.yaml.");
+    }
+
+    if (validated.getBody() != null && validated.getBody().get() instanceof JsonObject jsonBody) {
+      return jsonBody.mapTo(clazz);
+    }
+
+    throw new IllegalArgumentException("Request body is empty or not a valid JSON Object.");
   }
 }

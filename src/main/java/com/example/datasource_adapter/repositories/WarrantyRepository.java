@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static io.vertx.core.json.JsonObject.mapFrom;
+import static com.example.datasource_adapter.repositories.queries.warranties.WarrantyQueries.INSERT_WARRANTY;
+import static com.example.datasource_adapter.repositories.queries.warranties.WarrantyQueries.UPDATE_PRODUCT_TICKET_SIZE;
 
 public record WarrantyRepository(Pool dbPool) {
 
@@ -24,43 +25,19 @@ public record WarrantyRepository(Pool dbPool) {
   public WarrantyRepository {
   }
 
-  private static final String INSERT_WARRANTY_SQL = """
-    INSERT INTO manager.warranty (
-        id, warranty_asset_id, warranty_description, warranty_expires_in,
-        warranty_is_expired, warranty_created_at, warranty_created_by_dni,
-        warranty_created_by_email, product_id, warranty_type_id, provider_id
-    ) VALUES (
-        #{id}, #{warranty_asset_id}, #{warranty_description}, #{warranty_expires_in},
-        #{warranty_is_expired}, #{warranty_created_at},
-        #{warranty_created_by_dni}, #{warranty_created_by_email}, #{product_id},
-        #{warranty_type_id}, #{provider_id}
-    ) RETURNING *;
-    """;
-
-  // Added the raw SQL for the native update
-  private static final String UPDATE_PRODUCT_SQL = """
-    UPDATE schema_manager.product
-    SET ticket_size = #{ticketSize}
-    WHERE id = #{id}
-    """;
-
   public Single<WarrantyEntity> createWarranty(WarrantyEntity entity, String ticketSize) {
+    log.info("🚀 Preparing to insert Warranty Entity: {}", entity.id());
 
-    io.vertx.sqlclient.templates.TupleMapper<WarrantyEntity> coreTupleMapper =
-      io.vertx.sqlclient.templates.TupleMapper.mapper(w -> {
-        var map = mapFrom(w).getMap();
-        map.put("warranty_created_at", w.warrantyCreatedAt());
-        return map;
-      });
+    TupleMapper<WarrantyEntity> rxTupleMapper = TupleMapper.newInstance(
+      io.vertx.sqlclient.templates.TupleMapper.mapper(WarrantyEntity::toPersistenceMap)
+    );
 
-    io.vertx.sqlclient.templates.RowMapper<WarrantyEntity> coreRowMapper =
-      (io.vertx.sqlclient.Row row) -> row.toJson().mapTo(WarrantyEntity.class);
+    RowMapper<WarrantyEntity> rxRowMapper = RowMapper.newInstance(
+      (io.vertx.sqlclient.Row row) -> row.toJson().mapTo(WarrantyEntity.class)
+    );
 
-    TupleMapper<WarrantyEntity> rxTupleMapper = TupleMapper.newInstance(coreTupleMapper);
-    RowMapper<WarrantyEntity> rxRowMapper = RowMapper.newInstance(coreRowMapper);
-    log.info("🚀 Preparing to insert Warranty Entity: {}", entity);
     return dbPool.rxWithTransaction((SqlConnection client) ->
-      SqlTemplate.forQuery(client, INSERT_WARRANTY_SQL)
+      SqlTemplate.forQuery(client, INSERT_WARRANTY)
         .mapFrom(rxTupleMapper)
         .mapTo(rxRowMapper)
         .rxExecute(entity)
@@ -82,7 +59,7 @@ public record WarrantyRepository(Pool dbPool) {
               "ticketSize", ticketSize
             );
 
-            return SqlTemplate.forQuery(client, UPDATE_PRODUCT_SQL)
+            return SqlTemplate.forQuery(client, UPDATE_PRODUCT_TICKET_SIZE)
               .rxExecute(updateParams)
               .ignoreElement()
               .andThen(Maybe.just(insertedWarranty));
