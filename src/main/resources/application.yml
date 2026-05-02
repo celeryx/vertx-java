@@ -1,0 +1,10 @@
+server:
+  port: ${APP_PORT:8888}
+  host: ${APP_HOST:0.0.0.0}
+
+database:
+  name: ${DB_HOST:postgres}
+  host: ${DB_HOST:localhost}
+  port: ${DB_PORT:5433}
+  username: ${DB_USER:sertec}
+  password: ${DB_PASSWORD}

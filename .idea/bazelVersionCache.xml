@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BazelGithubResolverVersionCache">
+    <forks>
+      <entry key="bazelbuild">
+        <fork_state>
+          <option name="name" value="bazelbuild" />
+          <option name="version" value="9.1.0" />
+          <option name="lastUpdated" value="1777671242024" />
+        </fork_state>
+      </entry>
+    </forks>
+  </component>
+  <component name="BazelVersionCache">
+    <option name="latestBazelVersion" value="9.1.0" />
+    <option name="resolverId" value="github" />
+  </component>
+</project>

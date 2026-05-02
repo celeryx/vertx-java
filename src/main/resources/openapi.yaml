@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Datasource Migration API
+  version: 1.0.0
+paths:
+  /healthcheck:
+    get:
+      operationId: healthcheck
+      responses:
+        '200':
+          description: Service is healthy
+        '503':
+          description: Service is unavailable
+
+  /manager/warranty:
+    get:
+      operationId: getWarrantyByWarranty
+      responses:
+        '200':
+          description: Get warranty by warranty params
+    post:
+      operationId: createWarranty
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ assetNumber, daysToExpire, productId ]
+              properties:
+                assetNumber:
+                  type: string
+                  pattern: '^[0-9]+$'
+                daysToExpire:
+                  type: integer
+                  minimum: 1
+                productId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Warranty created
+
+  /manager/warranty/product:
+    get:
+      operationId: getWarrantiesByProduct
+      responses:
+        '200':
+          description: List of warranties by product
+
+  /manager/warranty/filtered:
+    get:
+      operationId: getFilteredWarranties
+      responses:
+        '200':
+          description: List filtered warranties
+
+  /manager/warranty/all:
+    get:
+      operationId: getAllWarranties
+      responses:
+        '200':
+          description: List all warranties
+
+  /manager/warranty/{id}:
+    patch:
+      operationId: updateWarrantyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Warranty updated
+    put:
+      operationId: replaceWarrantyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Warranty replaced

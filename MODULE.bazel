@@ -1,0 +1,43 @@
+module(
+    name = "java_vertx_migration_demo",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "rules_java", version = "9.1.0")
+bazel_dep(name = "rules_jvm_external", version = "6.7")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+
+maven.install(
+    artifacts = [
+        "io.vertx:vertx-core:5.0.11",
+        "io.vertx:vertx-health-check:5.0.11",
+        "io.vertx:vertx-launcher-application:5.0.11",
+        "io.vertx:vertx-config:5.0.11",
+        "io.vertx:vertx-config-yaml:5.0.11",
+        "io.vertx:vertx-web:5.0.11",
+        "io.vertx:vertx-rx-java3:5.0.11",
+        "io.reactivex.rxjava3:rxjava:3.1.8",
+        "com.google.inject:guice:7.0.0",
+        "io.vertx:vertx-openapi:5.0.11",
+        "io.vertx:vertx-web-openapi-router:5.0.11",
+        "org.slf4j:slf4j-api:2.0.12",
+        "ch.qos.logback:logback-classic:1.4.14",
+        "net.logstash.logback:logstash-logback-encoder:7.4",
+        "com.fasterxml.jackson.core:jackson-annotations:2.15.2",
+        "com.fasterxml.jackson.core:jackson-databind:2.15.2",
+        "org.mapstruct:mapstruct:1.5.5.Final",
+        "org.mapstruct:mapstruct-processor:1.5.5.Final",
+        "io.vertx:vertx-pg-client:5.0.11",
+        "io.vertx:vertx-sql-client:5.0.11",
+        "io.vertx:vertx-sql-client-templates:5.0.11",
+        # Testing artifacts
+        "io.vertx:vertx-junit5:5.0.11",
+        "org.junit.jupiter:junit-jupiter-api:5.9.1",
+        "org.junit.jupiter:junit-jupiter-engine:5.9.1",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+use_repo(maven, "maven")
